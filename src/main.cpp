@@ -10,10 +10,12 @@ int main(int argc, char* argv[]) {
         std::cout << "[USAGE] " << argv[0] << " <APIKEY> <...LABELS>" << std::endl;
     }
 
+    BingClient client{"https://api.bing.microsoft.com/v7.0/images/search", argv[1]};
+
+    // consume first elements
     argc-=2;
     argv+=2;
 
-    BingClient client{"https://api.bing.microsoft.com/v7.0/images/search", argv[1]};
     URLMap map = client.searchAll(argc, argv);
 
     Generator::makeDatabase("database", map);

@@ -24,5 +24,7 @@ class BingClient {
 
         URLMap searchAll(int count, char* keywords[]);
 
+        static size_t writeCallback(void *contents, size_t size, size_t nmemb, void *userp);
+
 
 };

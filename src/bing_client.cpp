@@ -1,7 +1,7 @@
 #include "bing_client.h"
 
 std::vector<std::string> BingClient::search(std::string query) {
-    return extractUrls(File("file.json").read());
+    // return extractUrls(File("file.json").read());
     CURL *c;
     struct curl_slist *chunk = NULL;
     c = curl_easy_init();
@@ -17,9 +17,11 @@ std::vector<std::string> BingClient::search(std::string query) {
         m_base_url + "?q=" + query + "&count=" + std::to_string(POST_PER_PAGE)
         }.c_str() );
     curl_easy_setopt(c, CURLOPT_WRITEDATA, &buffer);
+    curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_perform( c );
     curl_easy_cleanup( c );
 
+    // std::cout << buffer << std::endl;
     return extractUrls(buffer);
 }
 
@@ -27,6 +29,7 @@ URLMap BingClient::searchAll(int count, char* keywords[]) {
     URLMap result;
     for (int i = 0; i < count; i++)
     {
+        std::cout << keywords[i] << std::endl;
         std::vector<std::string> urls = search(keywords[i]);
         result[keywords[i]] += urls;
         //std::cout << keywords[i] << std::endl;
@@ -45,4 +48,9 @@ std::vector<std::string> BingClient::extractUrls(std::string json_string) {
     }
 
     return strings;
+}
+
+size_t BingClient::writeCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
 }
